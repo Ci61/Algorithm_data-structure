@@ -17,30 +17,55 @@ double calcul_e() {
 }
 
 /**************************************************************/
-/**2°**/
+/**2° Puissance**/
 /**************************************************************/
+/*version float*/
 float PuissanceFL(float x, int n) {
+	/*Version Complexite linéaire*/
+	//if (n == 0)
+	//	return 1.0;
+	//else
+	//	return x * PuissanceFL(x, (n - 1));
+
+	/*Version Complexite quadratique*/
 	float res = 1.0;
-	int i = 0;
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
 		res *= x;
 	return res;
 }
 
+/*version double*/
 double PuissanceDB(double x, int n) {
-	double res = 1.0;
-	int i = 0;
-	for (i = 0; i < n; i++)
-		res *= x;
-	return res;
+	
+	/*Version Complexite linéaire*/
+	if (n == 0)
+		return 1.0;
+	else
+		return x * PuissanceDB(x, (n - 1));
+	
+	/*Version Complexite quadratique*/
+	//double res = 1.0;
+	//if (n > 0) {
+	//	for (int i = 0; i < n; i++)
+	//		res *= x;
+	//}
+	//else if (n < 0) {
+	//	for (int i = 0; i < -n; i++)
+	//		res *=1.0 / x;
+	//}
+
+	//return res;
 }
 
 /*On fait plusieurs tests d'un coup*/
 void test_Puissance(int MAX) {
 	for (int k = 1; k < MAX; k++) {
-		double x = (double)(1 + pow(10, -k));
-		int n = (int)pow(10, k);
-		printf("%f^%d=%f\n",x,n, Puissance(x, n));
+		float xf= (float)(1.0 + pow(10, -k));
+		double xd = (double)(1.0 + pow(10, -k));
+		int n = -(int)pow(10, k);
+		printf("%f^%d=%f\n",xf,n, PuissanceFL(xf, n));
+		printf("%lf^%d=%lf\n", xd, n, PuissanceDB(xd, n));
+		printf("\n");
 	}
 }
 /*Obsevation: plus le k est grand, le résultat de (1 + 10^k)^(10^k) est plus proche du constant "e"*/
@@ -106,7 +131,7 @@ int main() {
 	//calcul_e();
 	
 	/*Test puissance*/
-	//test_Puissance(8);
+	test_Puissance(4);
 
 	/*Test Ackermann*/
 	//printf("%d\n", ack_V1(3, 3));

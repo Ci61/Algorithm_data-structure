@@ -189,7 +189,7 @@ void simplifie(image *img) {
 }
 
 bool meme_dessin(image img1, image img2) {
-	if ((img1 == NULL)) {
+	/*if ((img1 == NULL)) {
 		if (img2 == NULL)
 			return true;
 		else if (img2->toutnoir)
@@ -215,7 +215,7 @@ bool meme_dessin(image img1, image img2) {
 				&& meme_dessin(img1->fils[1], img2->fils[1]) 
 				&& meme_dessin(img1->fils[2], img2->fils[2]) 
 				&& meme_dessin(img1->fils[3], img2->fils[3]));
-	}
+	}*/
 }
 
 /*************************************************/
@@ -245,7 +245,7 @@ image diff_aux(image i1, image i2) {
 	}else if(i2==NULL){
 		return i1;
 	}else {
-		if (i1->toutnoir) {
+		if (i1->toutnoir) { //estNoir
 			if (i2->toutnoir) { return construit_blanc(); }
 			else {
 				negatif(&i2);
@@ -282,7 +282,6 @@ void RMemoire(image *img) {
 		}
 			*img = NULL;
 			free(*img);
-		
 	}
 }
 
@@ -321,7 +320,7 @@ void estPleineBis(image img,bool* b,int* h) {
 		estPleineBis(img->fils[1], &b2, &h2);
 		estPleineBis(img->fils[2], &b3, &h3);
 		estPleineBis(img->fils[3], &b4, &h4);
-		*b = b1&&b2&&b3&&b4&&(h1==h2==h3==h4);
+		*b = b1&&b2&&b3&&b4&&(h1==h2)&&(h2==h3)&&(h3==h4);
 		int t1 = h1 > h2 ? h1 : h2;
 		int t2 = h3 > h4 ? h3 : h4;
 		*h = (t1 > t2 ? t1 : t2 )+1;
@@ -329,7 +328,7 @@ void estPleineBis(image img,bool* b,int* h) {
 
 }
 
-int CompteSousImagesPleines(image img, int hauteur) {
+int CompteSousImagesPleines(image img, int hauteur) {/*Change l'hauteur au cours d'exécution*/
 	if ((img == NULL)||(img->toutnoir)) {
 		if (hauteur == 0)
 			return 1;
@@ -342,10 +341,10 @@ int CompteSousImagesPleines(image img, int hauteur) {
 		if ((h == hauteur)&&b) {
 			return 1;
 		}else {
-			return CompteSousImagesPleines(img->fils[0], hauteur) +
-				CompteSousImagesPleines(img->fils[1], hauteur) +
-				CompteSousImagesPleines(img->fils[2], hauteur) +
-				CompteSousImagesPleines(img->fils[3], hauteur);
+			return CompteSousImagesPleines(img->fils[0], hauteur-1) +
+				CompteSousImagesPleines(img->fils[1], hauteur-1) +
+				CompteSousImagesPleines(img->fils[2], hauteur-1) +
+				CompteSousImagesPleines(img->fils[3], hauteur-1);
 		}
 	}
 }
@@ -353,25 +352,6 @@ int CompteSousImagesPleines(image img, int hauteur) {
 /*************************************************/
 /* 11°Arrondit une image aux pixels de taille 1/2^k*/
 /*************************************************/
-/*	|| ((*img)->fils[0] == NULL
-			&& (*img)->fils[1] == NULL
-			&& (*img)->fils[3] == NULL)
-		|| ((*img)->fils[3] == NULL
-			&& (*img)->fils[1] == NULL
-			&& (*img)->fils[2] == NULL)
-		|| ((*img)->fils[0] == NULL
-			&& (*img)->fils[3] == NULL
-			&& (*img)->fils[2] == NULL)
-			
-			|| ((*img)->fils[0]->toutnoir
-				&& (*img)->fils[1]->toutnoir
-				&& (*img)->fils[3]->toutnoir)
-			|| ((*img)->fils[0]->toutnoir
-				&& (*img)->fils[3]->toutnoir
-				&& (*img)->fils[2]->toutnoir)
-			|| ((*img)->fils[1]->toutnoir
-				&& (*img)->fils[2]->toutnoir
-				&& (*img)->fils[3]->toutnoir)*/
 void arrondit(image *img,int k) {
 	if (0 < k 
 		&& (*img != NULL) 
@@ -382,14 +362,19 @@ void arrondit(image *img,int k) {
 		arrondit(&((*img)->fils[1]), k);
 		arrondit(&((*img)->fils[2]), k);
 		arrondit(&((*img)->fils[3]), k);
-	}else if (0 == k 
-		&& (*img != NULL) 
+	}
+	else if (k == 0
+		&& (*img != NULL)
 		&& !((*img)->toutnoir))
 	{
-		if ((*img)->fils[0] == NULL)
-			*img = construit_blanc();
-		else
+		if (aire(*img)>0.25) {
+			free(*img);
 			*img = construit_noir();
+		}
+		else {
+			free(*img);
+			*img = construit_blanc();
+		}
 	}
 }
 
@@ -498,18 +483,18 @@ int main() {
 	//simplifie(&simp);
 	//AI_Simple(simp);
 	/*Tester si deux images représentent le même dessin */
-	image md1= construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_composee(construit_blanc(), construit_blanc(), construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_noir(), construit_noir())));
-	image md2 = construit_composee(
-		construit_composee(construit_noir(), construit_noir(), construit_noir(), 
-			construit_composee(construit_noir(), construit_noir(), construit_noir(), 
-				construit_composee(construit_noir(), construit_noir(), construit_noir(), construit_noir()))),
-		construit_blanc(), construit_noir(),
-		construit_composee(construit_blanc(),
-			construit_composee(construit_blanc(), construit_blanc(), construit_blanc(), construit_blanc()),
-			construit_blanc(), construit_noir()));
-	AI_Simple(md1);	printf("\n");
-	AI_Simple(md2);	printf("\n");
-	printf("%d", meme_dessin(md1, md2));
+	//image md1= construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_composee(construit_blanc(), construit_blanc(), construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_noir(), construit_noir())));
+	//image md2 = construit_composee(
+	//	construit_composee(construit_noir(), construit_noir(), construit_noir(), 
+	//		construit_composee(construit_noir(), construit_noir(), construit_noir(), 
+	//			construit_composee(construit_noir(), construit_noir(), construit_noir(), construit_noir()))),
+	//	construit_blanc(), construit_noir(),
+	//	construit_composee(construit_blanc(),
+	//		construit_composee(construit_blanc(), construit_blanc(), construit_blanc(), construit_blanc()),
+	//		construit_blanc(), construit_noir()));
+	//AI_Simple(md1);	printf("\n");
+	//AI_Simple(md2);	printf("\n");
+	//printf("%d", meme_dessin(md1, md2));
 	//
 	/*Test Négatif*/
 	//AI_Simple(i3);	printf("\n");
@@ -529,17 +514,20 @@ int main() {
 	//printf("%d", est_blanche(rm)); printf("\n");
 
 	/*Test CompteSousImagesPleines*/
-	//printf("%d", CompteSousImagesPleines(tmp, 2));
-	//printf("%d", CompteSousImagesPleines(N, 0));
+	//image csip = construit_composee(construit_composee(construit_blanc(), construit_blanc(), construit_noir(), construit_blanc()), construit_composee(construit_noir(), construit_noir(),construit_blanc(), construit_noir()), construit_composee(construit_blanc(), construit_blanc(), construit_blanc(), construit_noir()), construit_composee(construit_noir(), construit_noir(), construit_noir(),construit_blanc()));
+	//image csip = LClavier(); 
+	//printf("%d\n", CompteSousImagesPleines(csip, 1));
+	//printf("%d", CompteSousImagesPleines(construit_noir(), 0));
 
 	/*Lecture de clavier*/
 	//AI_Simple(LClavier());
 
 	/*Test Arrondit*/
-	//image imgAr = construit_composee(B, construit_composee(N, N, B, N), construit_composee(N, B, N, N), construit_composee(B, N, N, N));
-	//AI_Simple(imgAr); printf("\n");
-	//arrondit(&imgAr, 0);
-	//AI_Simple(imgAr); printf("\n");
+	image imgAr = construit_composee(construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_blanc(), construit_noir()), construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_noir()), construit_composee(construit_blanc(), construit_noir(), construit_noir(), construit_noir()));
+	//image imgAr = construit_composee(construit_noir(),construit_noir(), construit_noir(), construit_blanc());
+	AI_Simple(imgAr); printf("\n");
+	arrondit(&imgAr, 0);
+	AI_Simple(imgAr); printf("\n");
 
 	/*Test Affichage 2^k*/
 	//int k = 3;
