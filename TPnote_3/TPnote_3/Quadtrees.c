@@ -152,44 +152,8 @@ double aire(image img) {
 /*************************************************/
 /* 6°Meme_dessin */
 /*************************************************/
-
-/*************************************************/
-/* 13° Simplifier la représentation d'une image */
-/*************************************************/
-void simplifie(image *img) {
-	if (!(*img == NULL) && !((*img)->toutnoir)) {
-		if ((*img)->fils[0]==NULL
-			&& (*img)->fils[1] == NULL
-			&& (*img)->fils[2] == NULL
-			&&(*img)->fils[3] == NULL)
-		{
-			free(*img);
-			*img = construit_blanc();
-
-		}
-		else if ((*img)->fils[0] != NULL
-			&& (*img)->fils[1] != NULL
-			&& (*img)->fils[2] != NULL
-			&& (*img)->fils[3] != NULL
-			&& (*img)->fils[0]->toutnoir
-			&& (*img)->fils[1]->toutnoir
-			&& (*img)->fils[2]->toutnoir
-			&& (*img)->fils[3]->toutnoir)
-		{
-			free(*img);
-			*img = construit_noir();
-		}
-		else {
-			simplifie(&((*img)->fils[0]));
-			simplifie(&((*img)->fils[1]));
-			simplifie(&((*img)->fils[2]));
-			simplifie(&((*img)->fils[3]));
-		}
-	}
-}
-
 bool meme_dessin(image img1, image img2) {
-	/*if ((img1 == NULL)) {
+	if ((img1 == NULL)) {
 		if (img2 == NULL)
 			return true;
 		else if (img2->toutnoir)
@@ -211,63 +175,54 @@ bool meme_dessin(image img1, image img2) {
 			&& meme_dessin(img1, img2->fils[2])
 			&& meme_dessin(img1, img2->fils[3]);
 	}else {
-		return (meme_dessin(img1->fils[0], img2->fils[0]) 
-				&& meme_dessin(img1->fils[1], img2->fils[1]) 
-				&& meme_dessin(img1->fils[2], img2->fils[2]) 
-				&& meme_dessin(img1->fils[3], img2->fils[3]));
-	}*/
+		if (img2 == NULL)
+			return false;
+		else if (img2->toutnoir) {
+			return meme_dessin(img1->fils[0], img2)
+					&& meme_dessin(img1->fils[1], img2)
+					&& meme_dessin(img1->fils[2], img2)
+					&& meme_dessin(img1->fils[3], img2);
+		}
+		else
+			return (meme_dessin(img1->fils[0], img2->fils[0]) 
+					&& meme_dessin(img1->fils[1], img2->fils[1]) 
+					&& meme_dessin(img1->fils[2], img2->fils[2]) 
+					&& meme_dessin(img1->fils[3], img2->fils[3]));
+	}
 }
 
 /*************************************************/
 /* 7°Diff_2Images */
 /*************************************************/
-/*************************************************/
-/* 12° (procedure qui TRANSFORME une image en son negatif) */
-/*************************************************/
-void negatif(image *img) {
-	if (*img == NULL) {
-		*img = construit_noir();
-	}
-	else if ((*img)->toutnoir) {
-		free(*img);
-		*img = construit_blanc();
+image Diff_2Images(image img1,image img2) {
+	if (img1 == NULL) {
+		return img2;
+	}else if(img2==NULL){
+		return img1;
 	}
 	else {
-		for (int i = 0; i < 4; i++) {
-			negatif(&((*img)->fils[i]));
-		}
+		if (img1->toutnoir) {
+			if (img2->toutnoir)
+				return construit_blanc();
+			else
+				return construit_composee(
+						Diff_2Images(img1, img2->fils[0]), 
+						Diff_2Images(img1, img2->fils[1]), 
+						Diff_2Images(img1, img2->fils[2]), 
+						Diff_2Images(img1, img2->fils[3]));
+		}else if(img2->toutnoir)
+			return construit_composee(
+						Diff_2Images(img1->fils[0], img2), 
+						Diff_2Images(img1->fils[1], img2), 
+						Diff_2Images(img1->fils[2], img2), 
+						Diff_2Images(img1->fils[3], img2));
+		else
+			return construit_composee(
+						Diff_2Images(img1->fils[0], img2->fils[0]), 
+						Diff_2Images(img1->fils[1], img2->fils[1]), 
+						Diff_2Images(img1->fils[2], img2->fils[2]), 
+						Diff_2Images(img1->fils[3], img2->fils[3]));
 	}
-}
-
-image diff_aux(image i1, image i2) {
-	if (i1 == NULL) {
-		return i2;
-	}else if(i2==NULL){
-		return i1;
-	}else {
-		if (i1->toutnoir) { //estNoir
-			if (i2->toutnoir) { return construit_blanc(); }
-			else {
-				negatif(&i2);
-				return i2;
-			}
-		}
-		else if (i2->toutnoir) {
-			negatif(&i1);
-			return i1;
-		}
-		else{
-			return construit_composee(diff_aux(i1->fils[0], i2->fils[0]), diff_aux(i1->fils[1], i2->fils[1]), diff_aux(i1->fils[2], i2->fils[2]), diff_aux(i1->fils[3], i2->fils[3]));
-		}
-	}
-}
-
-image Diff_2Images(image i1,image i2) {
-	image tmp1 = copie(i1);
-	image tmp2= copie(i2);
-	simplifie(&tmp1);
-	simplifie(&tmp2);
-	return diff_aux(tmp1, tmp2);
 }
 
 /*************************************************/
@@ -280,8 +235,8 @@ void RMemoire(image *img) {
 				RMemoire(&((*img)->fils[i]));
 			}
 		}
-			*img = NULL;
-			free(*img);
+		*img = NULL;
+		free(*img);
 	}
 }
 
@@ -374,6 +329,59 @@ void arrondit(image *img,int k) {
 		else {
 			free(*img);
 			*img = construit_blanc();
+		}
+	}
+}
+
+/*************************************************/
+/* 12° (procedure qui TRANSFORME une image en son negatif) */
+/*************************************************/
+void negatif(image *img) {
+	if (*img == NULL) {
+		*img = construit_noir();
+	}
+	else if ((*img)->toutnoir) {
+		free(*img);
+		*img = construit_blanc();
+	}
+	else {
+		for (int i = 0; i < 4; i++) {
+			negatif(&((*img)->fils[i]));
+		}
+	}
+}
+
+/*************************************************/
+/* 13° Simplifier la représentation d'une image */
+/*************************************************/
+void simplifie(image *img) {
+	if (!(*img == NULL) && !((*img)->toutnoir)) {
+		if ((*img)->fils[0] == NULL
+			&& (*img)->fils[1] == NULL
+			&& (*img)->fils[2] == NULL
+			&& (*img)->fils[3] == NULL)
+		{
+			free(*img);
+			*img = construit_blanc();
+
+		}
+		else if ((*img)->fils[0] != NULL
+			&& (*img)->fils[1] != NULL
+			&& (*img)->fils[2] != NULL
+			&& (*img)->fils[3] != NULL
+			&& (*img)->fils[0]->toutnoir
+			&& (*img)->fils[1]->toutnoir
+			&& (*img)->fils[2]->toutnoir
+			&& (*img)->fils[3]->toutnoir)
+		{
+			free(*img);
+			*img = construit_noir();
+		}
+		else {
+			simplifie(&((*img)->fils[0]));
+			simplifie(&((*img)->fils[1]));
+			simplifie(&((*img)->fils[2]));
+			simplifie(&((*img)->fils[3]));
 		}
 	}
 }
@@ -482,6 +490,7 @@ int main() {
 	//AI_Simple(simp); printf("\n");
 	//simplifie(&simp);
 	//AI_Simple(simp);
+	
 	/*Tester si deux images représentent le même dessin */
 	//image md1= construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_composee(construit_blanc(), construit_blanc(), construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_noir(), construit_noir())));
 	//image md2 = construit_composee(
@@ -500,10 +509,13 @@ int main() {
 	//AI_Simple(i3);	printf("\n");
 	//negatif(&i3);
 	//AI_Simple(i3);	printf("\n");
+	
 	/*Test Différence de deux images*/
-	//AI_Simple(i1); printf("\n");
-	//AI_Simple(i2); printf("\n");
-	//image tmpDiff = Diff_2Images(i1, i2);
+	//image diff1 = construit_composee(construit_noir(), construit_blanc(), construit_blanc(), construit_noir());
+	//image diff2 = construit_composee(construit_noir(), construit_noir(), construit_noir(), construit_noir());
+	//AI_Simple(diff1); printf("\n");
+	//AI_Simple(diff2); printf("\n");
+	//image tmpDiff = Diff_2Images(diff1, diff2);
 	//AI_Simple(tmpDiff); printf("\n");
 
 	/*Test : Rendre une image à la mémoire */
@@ -523,11 +535,11 @@ int main() {
 	//AI_Simple(LClavier());
 
 	/*Test Arrondit*/
-	image imgAr = construit_composee(construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_blanc(), construit_noir()), construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_noir()), construit_composee(construit_blanc(), construit_noir(), construit_noir(), construit_noir()));
-	//image imgAr = construit_composee(construit_noir(),construit_noir(), construit_noir(), construit_blanc());
-	AI_Simple(imgAr); printf("\n");
-	arrondit(&imgAr, 0);
-	AI_Simple(imgAr); printf("\n");
+	//image imgAr = construit_composee(construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_blanc(), construit_noir()), construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_noir()), construit_composee(construit_blanc(), construit_noir(), construit_noir(), construit_noir()));
+	////image imgAr = construit_composee(construit_noir(),construit_noir(), construit_noir(), construit_blanc());
+	//AI_Simple(imgAr); printf("\n");
+	//arrondit(&imgAr, 0);
+	//AI_Simple(imgAr); printf("\n");
 
 	/*Test Affichage 2^k*/
 	//int k = 3;
