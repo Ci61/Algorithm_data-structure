@@ -27,6 +27,12 @@ typedef struct Bloc
 } Bloc;
 typedef Bloc *Liste;
 
+
+/*************************************************/
+/* */
+/* definition type liste de liste*/
+/* */
+/*************************************************/
 typedef struct BlocListe
 {
 	Liste elem;
@@ -348,9 +354,12 @@ LDL ATP(int n, Liste l) {
 }
 
 LDL ATPTL(int n, LDL ldl) {
+	if (estVideLDL(ldl)) {
 		return ldl;
-	else
+	}
+	else {
 		return concatene(ATP(n, premierLDL(ldl)), ATPTL(n, suiteLDL(ldl)));
+	}
 }
 
 LDL permutation(int n) {
@@ -423,7 +432,7 @@ int MZC_Viter(Liste l) {
 	}
 }
 
-/*Sous fonction avec 3 arguments*/
+/*Sous fonction avec 3 arguments in*/
 int MZC_VRec1_Aux(Liste l,int cpt,int MaxZero) {
 	if (estVide(l))
 		return MaxZero;
@@ -450,7 +459,7 @@ int MZC_VRec1(Liste l) {
 	return MZC_VRec1_Aux(l, cpt, MaxZero);
 }
 
-/*Sous fonction avec 2 arguments*/
+/*Sous fonction avec 2 arguments out*/
 void MZC_VRec2_Aux(Liste l, int *cpt,int *MaxZero) {
 	//printf("cpt: %d; Maxzero: %d \n",*cpt,*MaxZero);
 	if (estVide(l)) {
@@ -475,8 +484,8 @@ int MZC_VRec2(Liste l) {
 	int MaxZero = (int)malloc(sizeof(int));
 	MZC_VRec2_Aux(l, &cpt, &MaxZero);
 	return MaxZero;
-	free(cpt);
-	free(MaxZero);
+	free(&cpt);
+	free(&MaxZero);
 }
 
 /*************************************************/
@@ -492,13 +501,12 @@ void EP_aux(Liste *p,Liste l,bool *res) {
 			*res = false;
 		}
 		*p = (*p)->suivant;
-		
 	}
 }
 
 bool EstPalindrome(Liste l) {
 	Liste p = l;
-	bool res= (bool)malloc(sizeof(int));;
+	bool res;
 	EP_aux(&p,l, &res);
 	return res;
 }
@@ -542,13 +550,16 @@ bool EstPalindrome(Liste l) {
  void ajouteFiles(File *pfile,int item) {
 	 
 	if ((*pfile)==NULL){
-		/*Si la file est vide, on va créer une liste avec un seul bloc dont son bloc suivant est lui-même */
+		/*Si la file est vide,
+		* on va créer une liste avec un seul bloc dont son bloc suivant est lui-même */
 		 *pfile = (File)malloc(sizeof(Liste));
 		 (*(*pfile)) = (Liste)malloc(sizeof(Bloc));
 		 (*(*pfile))->nombre = item;
 		 (*(*pfile))->suivant = *(*pfile);
 	}else{
-		 /*si la liste n'est pas vide, on ajoute un nouveau bloc à la fin de la et il pointe vers le premier bloc créé de la liste */
+		 /*Si la liste n'est pas vide,
+		 * on ajoute un nouveau bloc à sa fin
+		 * et ce nouveau bloc pointe vers le premier bloc créé de la liste */
 		 Liste tmp = (Liste)malloc(sizeof(Bloc));
 		 tmp->nombre = item;
 		 tmp->suivant = (*(*pfile))->suivant;
@@ -556,23 +567,6 @@ bool EstPalindrome(Liste l) {
 		 *(*pfile) = tmp;
 	}
  }
-
-
- //void aff_file_iter(Liste l)
- //{
-	// if (l == NULL)
-	//	 printf("NULL");
-	// else {
-	//	 int i = l->nombre;
-	//	 printf("%d  ", i);
-	//	 l = l->suivant;
-	//	 while (l->nombre != i) {
-	//		 printf("%d  ", l->nombre);
-	//		 l = l->suivant;
-	//	 }
-	// }
-
- //}
 
 void sortirFiles(File *pfile, int* x) {
 	if ((*pfile) ISNOT NULL) {
@@ -617,7 +611,7 @@ int main(int argc, char** argv){
 	//initVide(&sse1);
 	//initVide(&sse2);
 	//empile(3, &sse1);
-	//empile(2, &sse2);
+	//empile(2, &sse1);
 	//empile(1, &sse1);
 	//empile(5, &sse2);
 	//empile(4, &sse2);
@@ -629,7 +623,7 @@ int main(int argc, char** argv){
 	//printf("sse1 est SousEnsemble de sse2:%d\n", SousEnsemble(sse1,sse2));
 
 	/*test Permutation*/
-	//int n=4;
+	//int n=3;
 	//affiche_LDL(permutation(n));
 	
 	/*test EliminePositionsPaires*/
@@ -694,7 +688,7 @@ int main(int argc, char** argv){
 	//empile(2, &epd);
 	//empile(8, &epd);
 	//empile(8, &epd);
-	//empile(8, &epd);
+	//empile(7, &epd);
 	//empile(8, &epd);
 	//empile(2, &epd);
 	//affiche_iter(epd);

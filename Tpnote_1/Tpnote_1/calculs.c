@@ -1,4 +1,5 @@
 #include <stdio.h>
+/*le math.h sert à faire des tests dans le main, il n'est utilisé dans auncune fonction.*/
 #include <math.h>
 #include <windows.h>
 
@@ -19,57 +20,79 @@ double calcul_e() {
 /**************************************************************/
 /**2° Puissance**/
 /**************************************************************/
-/*version float*/
-float PuissanceFL(float x, int n) {
-	/*Version Complexite linéaire*/
-	//if (n == 0)
-	//	return 1.0;
-	//else
-	//	return x * PuissanceFL(x, (n - 1));
-
-	/*Version Complexite quadratique*/
+/*Float: version complexite quadratique*/
+float PS_Fl_Quad(float x, long n) {
 	float res = 1.0;
-	for (int i = 0; i < n; i++)
-		res *= x;
+	if (n > 0) {
+		for (long i = 0; i < n; i++)
+			res *= x;
+	}
+	else if (n < 0) {
+		for (long i = 0; i < -n; i++)
+			res =res*( 1.0 / x);
+	}
 	return res;
 }
 
-/*version double*/
-double PuissanceDB(double x, int n) {
-	
-	/*Version Complexite linéaire*/
+/*Float: Version complexite linéaire*/
+float PS_Fl_Lin(float x, long n) {
 	if (n == 0)
 		return 1.0;
+	else if (n < 0)
+		return 1.0 / PS_Fl_Lin(x,-n);
 	else
-		return x * PuissanceDB(x, (n - 1));
-	
-	/*Version Complexite quadratique*/
-	//double res = 1.0;
-	//if (n > 0) {
-	//	for (int i = 0; i < n; i++)
-	//		res *= x;
-	//}
-	//else if (n < 0) {
-	//	for (int i = 0; i < -n; i++)
-	//		res *=1.0 / x;
-	//}
-
-	//return res;
+		return x * PS_Fl_Lin(x, (n - 1));
 }
 
-/*On fait plusieurs tests d'un coup*/
-void test_Puissance(int MAX) {
-	for (int k = 1; k < MAX; k++) {
-		float xf= (float)(1.0 + pow(10, -k));
-		double xd = (double)(1.0 + pow(10, -k));
-		int n = -(int)pow(10, k);
-		printf("%f^%d=%f\n",xf,n, PuissanceFL(xf, n));
-		printf("%lf^%d=%lf\n", xd, n, PuissanceDB(xd, n));
-		printf("\n");
+/*Float: Version complexite log*/
+float PS_Fl_log(float x, long n, float r) {
+	//printf("%d\n",n);
+	if (n == 0)
+		return r;
+	else {
+		if (n % 2 == 0)
+			return PS_Fl_log(x*x, n / 2, r);
+		else
+			return PS_Fl_log(x*x, n / 2, r*x);
 	}
 }
-/*Obsevation: plus le k est grand, le résultat de (1 + 10^k)^(10^k) est plus proche du constant "e"*/
 
+
+/*Double: version complexite quadratique*/
+double PS_DB_Quad(double x, long n) {	
+	double res = 1.0;
+	if (n > 0) {
+		for (long i = 0; i < n; i++)
+			res *= x;
+	}
+	else if (n < 0) {
+		for (long i = 0; i < -n; i++)
+			res *=1.0 / x;
+	}
+	return res;
+}
+
+/*Double: Version complexite lineaire*/
+double PS_DB_Lin(double x, long n) {
+	if (n == 0)
+		return 1.0;
+	else if (n < 0)
+		return 1.0 / PS_DB_Lin(x,-n);
+	else
+		return x * PS_DB_Lin(x, (n - 1));
+}
+
+/*Double: Version complexite log*/
+double PS_DB_log(double x, long n, double r) {
+	if (n == 0)
+		return r;
+	else {
+		if (n % 2 == 0)
+			return PS_DB_log(x*x, n / 2, r);
+		else
+			return PS_DB_log(x*x,n/2,r*x);
+	}
+}
 
 /**************************************************************/
 /**3°les deux methodes pour calculer la fonction d'Ackermann**/
@@ -127,19 +150,57 @@ double reel_Rec(int n) {
 }
 
 int main() {
+	/**************************************************************/
 	/*Test e*/
 	//calcul_e();
+	/**************************************************************/
 	
+	/**************************************************************/
 	/*Test puissance*/
-	test_Puissance(4);
+	/*Je definie la valeur maximale de k */
+	int MAX = 4;
+	/* On fait la comparaison des resultats avec une boucle,
+	 * J'utilise la fonction pow(x,y) pour initilaiser les valeurs a tester
+	 */
+	for (int k = 1; k < MAX; k++) {
+		float xf = (float)(1.0 + pow(10, -k));
+		double xd = (double)(1.0 + pow(10, -k));
+		long n = (long)pow(10, k);
+		printf("Resultat du type float pour calculer %f^%d= \n", xf, n);
+		printf("Complexite quadratique: %f\n", PS_Fl_Quad(xf, n));
+		printf("Complexite lineaire: %f\n", PS_Fl_Lin(xf, n));
+		printf("Complexite ln: %f\n", PS_Fl_log(xf, n, 1.0));
+		printf("Resultat du type double pour calculer %f^%d= \n", xd, n);
+		printf("Double qudratique: %lf^%d=%lf\n", xd, n, PS_DB_Quad(xd, n));
+		printf("Double lineaire: %lf^%d=%lf\n", xd, n, PS_DB_Lin(xd, n));
+		printf("Double log: %lf^%d=%lf\n", xd, n, PS_DB_log(xd, n, 1.0));
+		printf("\n");
 
+	}
+
+	/*Conclusion sur la comparaison:
+		1. Plus le k est grand,
+		   le resultat de (1 + 10^k)^(10^k) est plus proche du constant "e".
+		2. Le resultat du type double est plus precis que celui du type float
+		3. Pour les resultats de type float,
+		   plus la valeur de "10^k" est grande,
+		   le resultat de la version ayant une complexite en ln est plus precis,
+		   par rapport aux autres versions de float.
+	*/
+	/**************************************************************/
+
+
+	/**************************************************************/
 	/*Test Ackermann*/
 	//printf("%d\n", ack_V1(3, 3));
 	//printf("%d\n", ack_V2(3, 3));
+	/**************************************************************/
 
+	/**************************************************************/
 	/*Test réel*/
 	//printf("%f\n", reel_Iter(100));
 	//printf("%f\n", reel_Rec(100));
+	/**************************************************************/
 
 	Sleep(10000000);
 	return 0;

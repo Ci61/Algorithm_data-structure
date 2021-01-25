@@ -1,2 +1,4 @@
 ﻿  calculs.c
+e:\paris-saclay\s5\algo\workspace\tpnote_1\tpnote_1\calculs.c(31): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+e:\paris-saclay\s5\algo\workspace\tpnote_1\tpnote_1\calculs.c(41): warning C4244: 'return' : conversion de 'double' en 'float', perte possible de données
   Tpnote_1.vcxproj -> E:\Paris-Saclay\S5\Algo\WorkSpace\Tpnote_1\Debug\Tpnote_1.exe

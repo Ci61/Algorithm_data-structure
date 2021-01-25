@@ -56,21 +56,20 @@ void AI_Simple(image img) {
 		printf("B");
 	}
 	else if (img->toutnoir) {
-			printf("N");
+		printf("N");
 	}
 	else{
-			printf(".");
-			AI_Simple(img->fils[0]);
-			AI_Simple(img->fils[1]);
-			AI_Simple(img->fils[2]);
-			AI_Simple(img->fils[3]);
+		printf(".");
+		AI_Simple(img->fils[0]);
+		AI_Simple(img->fils[1]);
+		AI_Simple(img->fils[2]);
+		AI_Simple(img->fils[3]);
 	}
 }
 
 void ProfAux(image img,int* cpt) {
 	if (img == NULL) {
 		printf("B%d ",*cpt);
-
 	}
 	else if (img->toutnoir) {
 		printf("N%d ",*cpt);
@@ -106,16 +105,16 @@ bool est_noir(image img) {
 }
 
 bool est_blanche(image img) {
-	if (img == NULL) {
+	if (img == NULL)
 		return true;
-	}
-	else if (img->toutnoir) {
+	else if (img->toutnoir)
 		return false;
-	}else{
+	else{
 		return (est_blanche(img->fils[0]) 
-			&& est_blanche(img->fils[1]) 
-			&& est_blanche(img->fils[2]) 
-			&& est_blanche(img->fils[3]));
+				&& est_blanche(img->fils[1]) 
+				&& est_blanche(img->fils[2]) 
+				&& est_blanche(img->fils[3])
+				);
 	}
 }
 
@@ -123,14 +122,17 @@ bool est_blanche(image img) {
 /* 4°Copie */
 /*************************************************/
 image copie(image img) {
-	if (img == NULL) {
+	if (img == NULL)
 		return construit_blanc();
-	}
-	else if (img->toutnoir) {
+	else if (img->toutnoir)
 		return construit_noir();
-	}
 	else {
-		return  construit_composee(copie(img->fils[0]), copie(img->fils[1]), copie(img->fils[2]), copie(img->fils[3]));
+		return  construit_composee(
+					copie(img->fils[0]),
+					copie(img->fils[1]),
+					copie(img->fils[2]),
+					copie(img->fils[3])
+				);
 	}
 }
 
@@ -138,20 +140,23 @@ image copie(image img) {
 /* 5°Aire */
 /*************************************************/
 double aire(image img) {
-	if (img == NULL) {
+	if (img == NULL)
 		return 0;
-	}
-	else if (img->toutnoir) {
+	else if (img->toutnoir)
 		return 1;
-	}
 	else {
-		return (aire(img->fils[0]) + aire(img->fils[1]) + aire(img->fils[2]) + aire(img->fils[3]))/4;
+		return (aire(img->fils[0])
+				+ aire(img->fils[1])
+				+ aire(img->fils[2])
+				+ aire(img->fils[3])
+				)/4;
 	}
 }
 
 /*************************************************/
 /* 6°Meme_dessin */
 /*************************************************/
+/*Je Compare toutes les possibilites d'img1 avec toutes possibilites d'img2 separement*/
 bool meme_dessin(image img1, image img2) {
 	if ((img1 == NULL)) {
 		if (img2 == NULL)
@@ -235,8 +240,8 @@ void RMemoire(image *img) {
 				RMemoire(&((*img)->fils[i]));
 			}
 		}
-		*img = NULL;
 		free(*img);
+		*img = NULL;
 	}
 }
 
@@ -262,6 +267,10 @@ image LClavier() {
 /*************************************************/
 /* 10°CompteSousImagesPleines */
 /*************************************************/
+
+/* Cette procedure auxiliere verifie si un arbre est parfait
+ * Et puis on recupere la hauteur de cet arbre par un pointeur.
+ */
 void estPleineBis(image img,bool* b,int* h) {
 	if ((img == NULL) || (img->toutnoir)) {
 		*b = true;
@@ -283,7 +292,7 @@ void estPleineBis(image img,bool* b,int* h) {
 
 }
 
-int CompteSousImagesPleines(image img, int hauteur) {/*Change l'hauteur au cours d'exécution*/
+int CompteSousImagesPleines(image img, int hauteur) {
 	if ((img == NULL)||(img->toutnoir)) {
 		if (hauteur == 0)
 			return 1;
@@ -296,10 +305,10 @@ int CompteSousImagesPleines(image img, int hauteur) {/*Change l'hauteur au cours
 		if ((h == hauteur)&&b) {
 			return 1;
 		}else {
-			return CompteSousImagesPleines(img->fils[0], hauteur-1) +
-				CompteSousImagesPleines(img->fils[1], hauteur-1) +
-				CompteSousImagesPleines(img->fils[2], hauteur-1) +
-				CompteSousImagesPleines(img->fils[3], hauteur-1);
+			return CompteSousImagesPleines(img->fils[0], hauteur) +
+				CompteSousImagesPleines(img->fils[1], hauteur) +
+				CompteSousImagesPleines(img->fils[2], hauteur) +
+				CompteSousImagesPleines(img->fils[3], hauteur);
 		}
 	}
 }
@@ -389,94 +398,44 @@ void simplifie(image *img) {
 /*************************************************/
 /* 14°Affichage 2^k pixel*/
 /*************************************************/
-//void printf2k(int m,int n,int k,char c) {
-//	int d = (int)pow(2, (*k));
-//	for (int i = 0; i < d; i++) {
-//		
-//	}
-//		printf("\n");
-//}
-//
-//void AI_2k(image img, int* k) {
-//	if (*k > 0) {
-//		int d = (int)pow(2, (*k));
-//		//int t = d / 2;
-//		if (img == NULL) {
-//			for (int j = 0; j < d; j++) {
-//				printf(".");
-//			}
-//			
-//		}
-//		else if (img->toutnoir) {
-//			for (int j = 0; j < d; j++)
-//				printf("8");
-//			printf("\n");
-//		}
-//		else {
-//			int kk = (*k) - 1;
-//			AI_2k(img->fils[0], &kk);
-//			AI_2k(img->fils[1], &kk);
-//
-//			AI_2k(img->fils[2], &kk);
-//			AI_2k(img->fils[3], &kk);
-//		}
-//	}else if (*k == 0) {
-//			if (img == NULL)
-//				printf(".");
-//			else if (img->toutnoir)
-//				printf("8");
-//			else
-//				printf("-");
-//	}
-//}
 
-//void AI_2k(image img, int k,int* p) {
-//		if ((img == NULL)&&((*p)<=k)) {
-//			int d = (int)pow(2, (k - (*p)));
-//			for (int i = 0; i < d; i++) {
-//				for (int j = 0; j < d; j++) {
-//					printf(".");
-//				}
-//				if (i < (d - 1))
-//					printf("\n");
-//			}
-//		}
-//		else if ((img->toutnoir) && ((*p) <= k)) {
-//			int d = (int)pow(2, (k - (*p)));
-//			for (int i = 0; i < d; i++) {
-//				for (int j = 0; j < d; j++) {
-//					printf("8");
-//				}
-//				if (i < (d - 1))
-//					printf("\n");
-//			}
-//		}		
-//		else {
-//			int pp=*p + 1;
-//			if (pp<=k) {
-//				AI_2k(img->fils[0], k, &pp);
-//				printf("\n");
-//				AI_2k(img->fils[1], k, &pp);
-//				printf("\n");
-//				AI_2k(img->fils[2], k, &pp);
-//				printf("\n");
-//				AI_2k(img->fils[3], k, &pp);
-//				printf("\n");
-//			}else {
-//				printf("-\n");
-//			}
-//
-//		}
-//	
-//}
-
-/*************************************************/
-/* 15°Alea*/
-/*************************************************/
-void alea(int k, int n) {
-
+/*L'affichage en 2k n'est pas realise entierement,
+* chaque partie de l'image sont affichée séparement.
+*/
+void AI_2k(image img, int* k) {
+	if (*k > 0) {
+		int d = (int)pow(2, (*k));
+		for (int i = 0; i < d; i++) {
+			if (img == NULL) {
+				for (int j = 0; j < d; j++) {
+					printf(".");
+				}
+				printf("\n");
+			}
+			else if (img->toutnoir) {
+				for (int j = 0; j < d; j++)
+					printf("8");
+				printf("\n");
+			}
+			else {
+				int kk = (*k) - 1;
+				AI_2k(img->fils[0], &kk);
+				AI_2k(img->fils[1], &kk);
+				AI_2k(img->fils[2], &kk);
+				AI_2k(img->fils[3], &kk);
+				break;
+			}
+		}
+	}
+	else if (*k == 0) {
+		if (img == NULL)
+			printf(".");
+		else if (img->toutnoir)
+			printf("8");
+		else
+			printf("-");
+	}
 }
-
 
 int main() {
 	
@@ -528,11 +487,8 @@ int main() {
 	/*Test CompteSousImagesPleines*/
 	//image csip = construit_composee(construit_composee(construit_blanc(), construit_blanc(), construit_noir(), construit_blanc()), construit_composee(construit_noir(), construit_noir(),construit_blanc(), construit_noir()), construit_composee(construit_blanc(), construit_blanc(), construit_blanc(), construit_noir()), construit_composee(construit_noir(), construit_noir(), construit_noir(),construit_blanc()));
 	//image csip = LClavier(); 
-	//printf("%d\n", CompteSousImagesPleines(csip, 1));
+	//printf("%d\n", CompteSousImagesPleines(csip, 2));
 	//printf("%d", CompteSousImagesPleines(construit_noir(), 0));
-
-	/*Lecture de clavier*/
-	//AI_Simple(LClavier());
 
 	/*Test Arrondit*/
 	//image imgAr = construit_composee(construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_blanc(), construit_noir()), construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_noir()), construit_composee(construit_blanc(), construit_noir(), construit_noir(), construit_noir()));
@@ -541,12 +497,22 @@ int main() {
 	//arrondit(&imgAr, 0);
 	//AI_Simple(imgAr); printf("\n");
 
+
 	/*Test Affichage 2^k*/
-	//int k = 3;
-	//image img2k= construit_composee(N, construit_composee(B, B, N, B), B, construit_composee(N, construit_composee(N, N, B, construit_composee(N, B, N, N)), B, N));
-	////image img2k = construit_composee(construit_composee(N, B, N, B), N, B, N);
-	//bool p=1;
-	//AI_2k(img2k, &k);
+	
+	image img2k = construit_composee(construit_blanc(), construit_composee(construit_noir(), construit_noir(), construit_blanc(), construit_noir()), construit_composee(construit_noir(), construit_blanc(), construit_noir(), construit_noir()), construit_composee(construit_blanc(), construit_noir(), construit_noir(), construit_noir()));
+	AI_Simple(img2k); printf("\n");
+	int k = 3;
+	//int len = (int)pow(2, k);
+	//char ** a;
+	//a = (char**)malloc(len * sizeof(char*));
+	//for (int i = 0; i < len; i++) {
+	//	a[i] = (char*)malloc(len * sizeof(char));
+	//}
+
+	AI_2k(img2k, &k);
+	//printf2k(&a, len);
+
 
 	Sleep(1000000000);
 	return 0;
